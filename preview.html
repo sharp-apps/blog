@@ -1,5 +1,7 @@
 API /preview
   * content : string - #Script to evaluate
 
-{{ formQuery.content  | evalTemplate({use:{plugins:'MarkdownScriptPlugin'}}) | assignTo:response }}
+{{ 'content' | importRequestParams }}
+
+{{ content  | evalTemplate({use:{plugins:'MarkdownScriptPlugin'}}) | assignTo:response }}
 {{ response | return({ contentType:'text/plain' }) }}
