@@ -60,8 +60,8 @@ Create blog.sqlite if not exists
     ===============================================
 
 {{#raw content}}{{#markdown}}
-All Blog posts have access to [#Script](https://sharpscript.net) features which enables they to use a highly-productive, 
-easy to use [sandboxed](https://sharpscript.net/docs/sandbox) dynamic templating language which lets you easily create live documents 
+All Blog posts have access to [ServiceStack Templates](http://templates.servicestack.net) features which enables they to use a highly-productive, 
+easy to use [sandboxed](http://templates.servicestack.net/docs/sandbox) dynamic templating language which lets you easily create live documents 
 [like this one](/posts/live-document-example):
 {{/markdown}}
 
@@ -133,7 +133,7 @@ Indent lines by 4 spaces to create pre-formatted code blocks in monospace font:
 
     $ cd /Users/Guest
 
-Follow [link to markdown block docs](https://sharpscript.net/docs/blocks#markdown) for more info.
+Follow [link to markdown block docs](http://templates.servicestack.net/docs/blocks#markdown) for more info.
 {{/markdown}}{{/raw}}
 
     {{ { title, content } | addTo: initialPosts }}
@@ -180,7 +180,7 @@ This is used in this Blog's [_init.html](https://github.com/NetCoreWebApps/Blog/
 {{ htmlError }}
 ```
 
-The output of the `_init` page is captured in the `initout` argument which can be inspected as a Script Argument as done in 
+The output of the `_init` page is captured in the `initout` argument which can be inspected as a template argument as done in 
 [log.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/log.html):
 
 ```
@@ -197,7 +197,7 @@ in the [/log](/log) page above.
 ## Customizable Auth Providers
 
 Auth Providers can be configured in the same way 
-[Web App Plugins can be registered](https://sharpscript.net/docs/sharp-apps#registering-servicestack-plugins) by first specifying 
+[Web App Plugins can be registered](http://sharpscript.net/docs/sharp-apps#registering-servicestack-plugins) by first specifying 
 you want to register the `AuthFeature` plugin with:
 
 ```
@@ -210,7 +210,7 @@ Then using `AuthFeature.AuthProviders` to specify which Auth Providers you want 
 AuthFeature.AuthProviders TwitterAuthProvider, GithubAuthProvider
 ```
 
-Each Auth Provider checks the Web Apps `app.settings` for its Auth Provider specific configuration it needs, e.g. to configure both 
+Each Auth Provider checks the Web Apps `web.settings` for its Auth Provider specific configuration it needs, e.g. to configure both 
 Twitter and GitHub Auth Providers you would populate it with your OAuth Apps details:
 
 ```
@@ -234,9 +234,9 @@ the built-in Markdown provider that ServiceStack uses with:
 markdownProvider MarkdownDeep
 ```
 
-## Rich Script Config Arguments
+## Rich Template Config Arguments
 
-Any `app.settings` configs that are prefixed with `args.` are made available to Sharp Pages. Any arguments which start with 
+Any `web.settings` configs that are prefixed with `args.` are made available to Template Pages. Any arguments which start with 
 `{` or `[` are automatically converted into a JS object:
 
 ```
@@ -268,11 +268,11 @@ args.blogHref /
     ============================================
 
 {{#raw content}}{{#markdown}}
-In addition to providing a productive dynamic language for generating HTML pages, Sharp Pages can also be used to rapidly develop Web APIs 
+In addition to providing a productive dynamic language for generating HTML pages, Template Pages can also be used to rapidly develop Web APIs 
 which can utilize [dynamic page routing](/posts/page-based-routing) to easily create data-driven JSON APIs using optimal pretty URLs, in 
 real-time without any C# classes or compilation in sight!
 
-The only difference between a Sharp Page that generates HTML or a Sharp Page that returns an API Response is that API pages use the 
+The only difference between a Template Page that generates HTML or a Template Page that returns an API Response is that API pages use the 
 **return** filter to return a value. 
 
 E.g. To create a **Hello World** C# ServiceStack Service you would typically create a Request DTO, Response DTO and a Service implementation:
@@ -331,11 +331,11 @@ Alternatively you can force a JSON Response by specifying it with:
 The [/preview.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/preview.html) page uses this to force a plain-text response with:
 
 ```
-{{ content  | evalScript({use:{plugins:'MarkdownScriptPlugin'}}) | assignTo:response }}
+{{ content  | evalTemplate({use:{plugins:'MarkdownScriptPlugin'}}) | assignTo:response }}
 {{ response | return({ contentType:'text/plain' }) }}
 ```
 
-The preview API above is what provides this Blog's Live Preview feature where it will render any #Script provided in the 
+The preview API above is what provides this Blog's Live Preview feature where it will render any ServiceStack Templates provided in the 
 **content** Query String or HTTP Post Form Data, e.g:
 
  - [/preview?content={{10|times|select:{pow(index,2)},}}](/preview?content={{10|times|select:{pow(index,2)},}})
@@ -374,7 +374,7 @@ Which also benefits from ServiceStack's multiple formats where the same API can 
 
 Which thanks to the live development workflow provides the most productive development experience to rapidly develop Web APIs or perform common 
 tasks like viewing adhoc SQL queries in Excel which can be further manipulated using the 
-[LINQ-like expressiveness](https://sharpscript.net/linq/restriction-operators) and wrist-friendly script methods available in #Script.
+[LINQ-like expressiveness](http://templates.servicestack.net/linq/restriction-operators) and wrist-friendly filters available in Templates.
 
 ### /posts/_slug/api Page
 
@@ -406,7 +406,7 @@ httpResult({
   response:          post,
   format:            'json',
   contentType:       'application/json',
-  'X-Powered-By':    'ServiceStack',
+  'X-Powered-By':    'ServiceStack Templates',
 }) 
 ```
 
@@ -415,7 +415,7 @@ Any other arguments like 'X-Powered-By' are returned as HTTP Response Headers.
 This behaves similarly to customizing a response with return arguments:
 
 ```
-{{ post | return({ format:'json', 'X-Powered-By':'ServiceStack' }) }}
+{{ post | return({ format:'json', 'X-Powered-By':'ServiceStack Templates' }) }}
 ```
 
 Using the explicit httpResult filter is useful for returning a custom HTTP Response that doesn't have a Response Body, e.g. the **New Post** page 
@@ -429,7 +429,7 @@ after they've successfully created a new Post:
 {{/if}}
 ```
 
-For more examples and info on API Pages checkout to the [API Pages docs](https://sharpscript.net/docs/api-pages).
+For more examples and info on API Pages checkout to the [API Pages docs](http://templates.servicestack.net/docs/api-pages).
 
 {{/markdown}}{{/raw}}
 
@@ -441,7 +441,7 @@ For more examples and info on API Pages checkout to the [API Pages docs](https:/
     ============================================
 
 {{#raw content}}{{#markdown}}
-Sharp Pages supports conventional page-based routes where the name of each page can be requested with or without its **.html** extension:
+Template Pages supports conventional page-based routes where the name of each page can be requested with or without its **.html** extension:
 
 | path | page |
 ------ | ---- |
@@ -493,30 +493,30 @@ If you follow the recommended `_{name}-partial.html` naming convention you will 
     ===============================
 
 {{#raw content}}{{#markdown}}
-This Blog App demonstrates some of the capabilities in [ServiceStack Sharp Apps](https://sharpscript.net/docs/sharp-apps) - an exciting real-time 
-development model for developing .NET Core Apps where entire Sharp Apps can be developed within a live hot-reload experience without any compilation, 
+This Blog App demonstrates some of the capabilities in [ServiceStack Web Apps](http://sharpscript.net/docs/sharp-apps) - an exciting real-time 
+development model for developing .NET Core Apps where entire Web Apps can be developed within a live hot-reload experience without any compilation, 
 build tools, dependencies, IDEs or any C# source code necessary by using the powerful and user-friendly 
-[#Script language](https://sharpscript.net/) and its comprehensive built-in functionality.
+[ServiceStack Templates language](http://templates.servicestack.net/) and its comprehensive built-in functionality.
 
 ### Ultimate Simplicity
 
 This eliminates much of the complexity inherent in developing .NET Web Applications which by their nature results in highly customizable Web Apps 
 where their entire functionality can be modified in real-time whilst the App is running, which is simple enough to be enhanced by non-developers 
-like Designers and Content Creators courtesy of its approachable [Handlebars-like](https://sharpscript.net/docs/blocks) and familiar 
-[JavaScript syntax](https://sharpscript.net/docs/expression-viewer#expression=map(range(1%2Ccount)%2C%20x%20%3D%3E%20x%20*%20x)&count=5).
+like Designers and Content Creators courtesy of its approachable [Handlebars-like](http://templates.servicestack.net/docs/blocks) and familiar 
+[JavaScript syntax](http://templates.servicestack.net/docs/expression-viewer#expression=map(range(1%2Ccount)%2C%20x%20%3D%3E%20x%20*%20x)&count=5).
 
 Compiled Apps can have a prohibitively large barrier to entry where any modification often requires downloading source code separately, setting 
 up a matching development environment with appropriate extensions and correct versions and non cursory level of experience with their chosen 
 language, frameworks, build tools and other platform idiosyncrasies. 
 
-By contrast Sharp Apps require no development environment, no IDE's or build tools with all source code already included as part of the App which 
+By contrast Web Apps require no development environment, no IDE's or build tools with all source code already included as part of the App which 
 can be modified in real-time by any text editor to instantly view changes as they're made. So Apps like http://redis.web-app.io which provide a 
 rich Admin UI for searching, browsing and modifying Redis's core data structures, can be easily enhanced by modifying a single 
-[index.html](https://github.com/sharp-apps/redis/blob/master/index.html) at the same time as using the App.
+[index.html](https://github.com/NetCoreWebApps/Redis/blob/master/app/index.html) at the same time as using the App.
 
 ## Blog App Features
 
-This [/Blog](https://github.com/sharp-apps/blog) App is another example of encapsulating useful functionality in a 
+This [/Blog](https://github.com/NetCoreWebApps/Blog/tree/master/app) Web App is another example of encapsulating useful functionality in a 
 highly customizable .NET Core Web App which to maximize approachability has no C# source code, plugins and uses no JavaScript or CSS frameworks.
 The development of which ended up being one of the most enjoyable experiences we've had in recent memory where all the usual complexities of 
 developing a C# Server and modern JS App has been dispensed and you can just focus on the App you want to create, 
@@ -524,21 +524,21 @@ using a plain-text editor on the left, a live updating browser on the right and 
 
 Any infrastructure dependencies have also been avoided by using SQLite by default which is 
 [automatically created an populated on first run](/posts/web-app-customizations) if no database exists, or if preferred can be 
-[changed to use any other popular RDBMS](https://sharpscript.net/docs/sharp-apps#multi-platform-configurations) using just config.
+[changed to use any other popular RDBMS](http://sharpscript.net/docs/sharp-apps#multi-platform-configurations) using just config.
 
 ### Multi User Blogging Platform
 
 Any number of users can Sign In via Twitter and publish content under their Twitter Username where only they'll be able to modify their own Content. 
 Setting up Twitter is as easy as it can be which just requires modifying the 
-[Twitter Auth Config in app.settings](/posts/web-app-customizations#customizable-auth-providers) with the URL where the blog 
+[Twitter Auth Config in web.settings](/posts/web-app-customizations#customizable-auth-providers) with the URL where the blog 
 is hosted and the OAuth Keys for the Twitter OAuth App created at https://apps.twitter.com
 
 ### Rich Content
 
 Whilst most blogging platforms just edit static text, each Post content has access to the powerful and 
-[Sandboxed](https://sharpscript.net/docs/sandbox) features in https://sharpscript.net which can be used to create 
+[Sandboxed](http://templates.servicestack.net/docs/sandbox) features in http://templates.servicestack.net which can be used to create 
 [Live Documents](/posts/live-document-example) or [Render Markdown](/posts/markdown-example) which is itself just 
-[one of the available blocks](https://sharpscript.net/docs/blocks#markdown) where it will render to HTML any content between the `markdown` blocks:
+[one of the available blocks](http://templates.servicestack.net/docs/blocks#markdown) where it will render to HTML any content between the `markdown` blocks:
 {{/markdown}}
 
 <pre><code>{​{#markdown}}
@@ -572,7 +572,7 @@ the database instead of `localStorage`.
 
 ### Server Validation
 
-The [new.html](https://github.com/sharp-apps/blog/blob/master/posts/new.html) and [edit.html](https://github.com/sharp-apps/blog/blob/master/posts/_slug/edit.html) pages shows examples of performing server validation with #Script:
+The [new.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/posts/new.html) and [edit.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/posts/_slug/edit.html) pages shows examples of performing server validation with ServiceStack Templates:
 
 ```
 {{ assignErrorAndContinueExecuting: ex }}
@@ -587,7 +587,7 @@ The [new.html](https://github.com/sharp-apps/blog/blob/master/posts/new.html) an
 
 ![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/livedemos/blog/server-validation.png)
 
-For more info see the docs on [Error Handling](https://sharpscript.net/docs/error-handling).
+For more info see the docs on [Error Handling](http://templates.servicestack.net/docs/error-handling).
 
 ### Live Previews
 
@@ -631,16 +631,16 @@ function livepreview(e) {
 ```
 
 To the [/preview.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/preview.html) API Page which just renders and captures any 
-#Script Content its sent and returns the output:
+Template Content its sent and returns the output:
 
 ```
-{{ content  | evalScript({use:{plugins:'MarkdownScriptPlugin'}}) | assignTo:response }}
+{{ content  | evalTemplate({use:{plugins:'MarkdownScriptPlugin'}}) | assignTo:response }}
 {{ response | return({ contentType:'text/plain' }) }}
 ```
 
-By default the `evalScript` method renders #Script in a new `ScriptContext` which can be customized to utilize any additional 
-`plugins`, script `methods` and `blocks` available in the configured [SharpPagesFeature](https://sharpscript.net/docs/sharp-pages), 
-or for full access you can use `{use:{context:true}}` to evaluate any #Script content under the same context that `evalScript` is run on.
+By default the `evalTemplate` filter renders Templates in a new `TemplateContext` which can be customized to utilize any additional 
+`plugins`, `filters` and `blocks` available in the configured [SharpPagesFeature](https://sharpscript.net/docs/sharp-pages), 
+or for full access you can use `{use:{context:true}}` to evaluate any Template content under the same context that `evalTemplate` is run on.
 
 {{/markdown}}{{/raw}}
 
