@@ -15,7 +15,7 @@ a { text-decoration: none; color: #428bca; }
 a:hover { text-decoration: underline; opacity: .8; }
 .page { min-width: 880px; max-width: 880px; }
 .page-edit {
-    width: 75%;
+    width: 85%;
     max-width: 1200px;
     padding: 1em;
 }
@@ -87,7 +87,7 @@ form .row {
 input, textarea {
     width: 99%;
     padding: .5%;
-    font-size:20px;
+    font-size:16px;
     border: 1px solid #eee;    
 }
 button {
