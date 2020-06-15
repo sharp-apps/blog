@@ -31,7 +31,7 @@ Create blog.sqlite if not exists
     |> dbExec
 }}
 
-{{ var postsCount = dbScalar(`SELECT COUNT(*) FROM Post`) }}
+{{ var postsCount = dbScalarSync(`SELECT COUNT(*) FROM Post`) }}
 
 {{#if postsCount == 0 }}
 
@@ -61,43 +61,47 @@ Create blog.sqlite if not exists
 
 {{#raw content}}{{#markdown}}
 All Blog posts have access to [ServiceStack Templates](https://sharpscript.net/) features which enables they to use a highly-productive, 
-easy to use [sandboxed](https://sharpscript.net//docs/sandbox) dynamic templating language which lets you easily create live documents 
+easy to use [sandboxed](https://sharpscript.net/docs/sandbox) dynamic templating language which lets you easily create live documents 
 [like this one](/posts/live-document-example):
 {{/markdown}}
 
 <pre>
-{{ var balance = 11200 }}
-{{ var projectedMonths = 10 }}
-{{'
-Salary:        4000
-App Royalties: 200
-'|> trim |> parseKeyValueText(':') |> to => monthlyRevenues }}
-{{'
-Rent      1000
-Internet  50
-Mobile    50
-Food      400
-Misc      200
-'|> trim |> parseKeyValueText |> to => monthlyExpenses }}
-{{ monthlyRevenues |> values |> sum |> to => totalRevenues }}
-{{ monthlyExpenses |> values |> sum |> to => totalExpenses }}
-{{ subtract(totalRevenues, totalExpenses) |> to => totalSavings }}
+```code
+11200             |> to => balance
+3                 |> to => projectedMonths
 
-Current Balance:              <b>{{ balance |> currency }}</b>
+#keyvalues monthlyRevenues ':'
+  Salary:         4000
+  App Royalties:  200
+/keyvalues
+
+#keyvalues monthlyExpenses
+  Rent            1000
+  Internet        50
+  Mobile          50
+  Food            400
+  Misc            200
+/keyvalues
+
+monthlyRevenues |> sum => it.Value |> to => totalRevenues
+monthlyExpenses |> sum => it.Value |> to => totalExpenses
+(totalRevenues - totalExpenses)    |> to => totalSavings
+```
+Current Balance: <b>{{ balance |> currency }}</b>
 
 Monthly Revenues:
-{{ monthlyRevenues |> toList |> select: { it.Key |> padRight(30) }{ it.Value |> currency }\n }}
-Total                         <b>{{ totalRevenues |> currency }}</b>
+{{monthlyRevenues |> select: {it.Key.padRight(16)} {it.Value.currency()}\n }}
+Total            <b>{{ totalRevenues |> currency }}</b>
 
 Monthly Expenses:
-{{ monthlyExpenses |> toList |> select: { it.Key |> padRight(30) }{ it.Value |> currency }\n }}
-Total                         <b>{{ totalExpenses |> currency }}</b>
+{{monthlyExpenses |> select: {it.Key.padRight(16)} {it.Value.currency()}\n }}
+Total            <b>{{ totalExpenses |> currency }}</b>
 
-Monthly Savings:              <b>{{ totalSavings |> currency }}</b>
+Monthly Savings: <b>{{ totalSavings  |> currency }}</b>
 
 Projected Cash Position:
-{{ projectedMonths |> times |> map => index + 1
- |> select: { now |> addMonths(it) |> dateFormat }                    <b>{ totalSavings |> multiply(it) |> add(balance) |> currency }</b>\n }}
+{{projectedMonths.times() |> map => index + 1 |> map => 
+`${now.addMonths(it).dateFormat()}       ${(it * totalSavings + balance).currency()}`|> joinln}}
 </pre>{{/raw}}
 
     {{ { title, content } |> addTo => initialPosts }}
@@ -133,7 +137,7 @@ Indent lines by 4 spaces to create pre-formatted code blocks in monospace font:
 
     $ cd /Users/Guest
 
-Follow [link to markdown block docs](https://sharpscript.net//docs/blocks#markdown) for more info.
+Follow [link to markdown block docs](https://sharpscript.net/docs/blocks#markdown) for more info.
 {{/markdown}}{{/raw}}
 
     {{ { title, content } |> addTo: initialPosts }}
@@ -149,7 +153,7 @@ Follow [link to markdown block docs](https://sharpscript.net//docs/blocks#markdo
 Just like `Global.asax.cs` can be used to run Startup logic in ASP.NET Web Applications and `Startup.cs` in .NET Core Apps, 
 you can add a `_init.html` to run logic once on Startup. 
 
-This is used in this Blog's [_init.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/_init.html) where it will create a new 
+This is used in this Blog's [_init.html](https://github.com/sharp-apps/blog/blob/master/app/_init.html) where it will create a new 
 `blog.sqlite` database if it doesn't exist seeded with the UserInfo and Posts Tables and initial data, e.g:
 
 ```
@@ -165,7 +169,7 @@ This is used in this Blog's [_init.html](https://github.com/NetCoreWebApps/Blog/
     |> dbExec
 }}
 
-{{ var postsCount = dbScalar(`SELECT COUNT(*) FROM Post`) }}
+{{ var postsCount = dbScalarSync(`SELECT COUNT(*) FROM Post`) }}
 
 {{#if postsCount == 0 }}
 
@@ -181,7 +185,7 @@ This is used in this Blog's [_init.html](https://github.com/NetCoreWebApps/Blog/
 ```
 
 The output of the `_init` page is captured in the `initout` argument which can be inspected as a template argument as done in 
-[log.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/log.html):
+[log.html](https://github.com/sharp-apps/blog/blob/master/app/log.html):
 
 ```
 <div>
@@ -197,7 +201,7 @@ in the [/log](/log) page above.
 ## Customizable Auth Providers
 
 Auth Providers can be configured in the same way 
-[Web App Plugins can be registered](http://sharpscript.net/docs/sharp-apps#registering-servicestack-plugins) by first specifying 
+[Web App Plugins can be registered](https://sharpscript.net/docs/sharp-apps#registering-servicestack-plugins) by first specifying 
 you want to register the `AuthFeature` plugin with:
 
 ```
@@ -299,7 +303,7 @@ public class HelloService : Service
 > Usage: /hello/\{name}
 
 An API which returns the same wire response as above can be implemented in API Pages by creating a page at 
-[/hello/_name/index.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/hello/_name/index.html) 
+[/hello/_name/index.html](https://github.com/sharp-apps/blog/blob/master/app/hello/_name/index.html) 
 with the contents:
 
 ```
@@ -328,14 +332,14 @@ Alternatively you can force a JSON Response by specifying it with:
 
 > Usage: /preview?content=\{templates}
 
-The [/preview.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/preview.html) page uses this to force a plain-text response with:
+The [/preview.html](https://github.com/sharp-apps/blog/blob/master/app/preview.html) page uses this to force a plain-text response with:
 
 ```
 {{ var response = content.evalTemplate({use:{plugins:'MarkdownScriptPlugin'}}) }}
 {{ response |> return({ contentType:'text/plain' }) }}
 ```
 
-The preview API above is what provides this Blog's Live Preview feature where it will render any ServiceStack Templates provided in the 
+The preview API above is what provides this Blog's Live Preview feature where it will render any #Script provided in the 
 **content** Query String or HTTP Post Form Data, e.g:
 
  - [/preview?content={{10|times|select:{pow(index,2)},}}](/preview?content={{10|times|select:{pow(index,2)},}})
@@ -348,7 +352,7 @@ Which renders the plain text response:
 
 > Usage: /\{user}/api
 
-The [/_user/api.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/_user/api.html) API page shows an example of how easy it is to 
+The [/_user/api.html](https://github.com/sharp-apps/blog/blob/master/app/_user/api.html) API page shows an example of how easy it is to 
 create data-driven APIs where you can literally return the response of an SQL query by calling the `dbSelect` filter and returning the results with:
 
 ```
@@ -374,13 +378,13 @@ Which also benefits from ServiceStack's multiple formats where the same API can 
 
 Which thanks to the live development workflow provides the most productive development experience to rapidly develop Web APIs or perform common 
 tasks like viewing adhoc SQL queries in Excel which can be further manipulated using the 
-[LINQ-like expressiveness](https://sharpscript.net//linq/restriction-operators) and wrist-friendly filters available in Templates.
+[LINQ-like expressiveness](https://sharpscript.net/linq/restriction-operators) and wrist-friendly filters available in #Script.
 
 ### /posts/_slug/api Page
 
 > Usage:  /posts/\{slug}/api
 
-The [/posts/_slug/api.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/posts/_slug/api.html) page shows an example of using the 
+The [/posts/_slug/api.html](https://github.com/sharp-apps/blog/blob/master/app/posts/_slug/api.html) page shows an example of using the 
 `httpResult` filter to return a custom HTTP Response where if the post with the specified slug does not exist it will return a 
 `404 Post was not found` HTTP Response:
 
@@ -415,12 +419,12 @@ Any other arguments like 'X-Powered-By' are returned as HTTP Response Headers.
 This behaves similarly to customizing a response with return arguments:
 
 ```
-{{ post |> return({ format:'json', 'X-Powered-By':'ServiceStack Templates' }) }}
+{{ post |> return({ format:'json', 'X-Powered-By':'ServiceStack #Script' }) }}
 ```
 
 Using the explicit httpResult filter is useful for returning a custom HTTP Response that doesn't have a Response Body, e.g. the **New Post** page 
 uses `httpFilter` to 
-[redirect back to the Users posts page](https://github.com/NetCoreWebApps/Blog/blob/e8bb7249192c5797348ced091ad5fd434db9a619/app/posts/new.html#L33) 
+[redirect back to the Users posts page](https://github.com/sharp-apps/blog/blob/e8bb7249192c5797348ced091ad5fd434db9a619/app/posts/new.html#L33) 
 after they've successfully created a new Post:
 
 ```
@@ -429,7 +433,7 @@ after they've successfully created a new Post:
 {{/if}}
 ```
 
-For more examples and info on API Pages checkout to the [API Pages docs](https://sharpscript.net//docs/api-pages).
+For more examples and info on API Pages checkout to the [API Pages docs](https://sharpscript.net/docs/api-pages).
 
 {{/markdown}}{{/raw}}
 
@@ -446,24 +450,24 @@ Template Pages supports conventional page-based routes where the name of each pa
 | path | page |
 ------ | ---- |
 [/db](/db) |  |
-[/db.html](/db.html) | [/db.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/db.html) |
+[/db.html](/db.html) | [/db.html](https://github.com/sharp-apps/blog/blob/master/app/db.html) |
 [/posts/new](/posts/new) | |
-[/posts/new.html](/posts/new.html) | [/posts/new.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/posts/new.html)
+[/posts/new.html](/posts/new.html) | [/posts/new.html](https://github.com/sharp-apps/blog/blob/master/app/posts/new.html)
 
 and the default route **/** maps to the `index.html` in each directory if it exists, e.g:
 
 | path | page |
 ------ | ---- |
-[/](/) | [/index.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/index.html) |
+[/](/) | [/index.html](https://github.com/sharp-apps/blog/blob/master/app/index.html) |
 
 Nuxt-like [Dynamic Routes](https://nuxtjs.org/guide/routing#dynamic-routes) can also be used where any **file** or **directory** names 
 prefixed with an _ **underscore** allows for dynamic wildcard paths with the matching path component also assigned to the arguments name:
 
 | path | page | arguments |
 ------ | ---- | --------- |
-[/ServiceStack](/) | [/_user/index.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/_user/index.html) | user=ServiceStack |
-[/posts/markdown-example](/posts/markdown-example) | [/posts/_slug/index.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/posts/_slug/index.html) | slug=markdown-example |
-[/posts/markdown-example/edit](/posts/markdown-example/edit) | [/posts/_slug/edit.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/posts/_slug/edit.html) | slug=markdown-example |
+[/ServiceStack](/) | [/_user/index.html](https://github.com/sharp-apps/blog/blob/master/app/_user/index.html) | user=ServiceStack |
+[/posts/markdown-example](/posts/markdown-example) | [/posts/_slug/index.html](https://github.com/sharp-apps/blog/blob/master/app/posts/_slug/index.html) | slug=markdown-example |
+[/posts/markdown-example/edit](/posts/markdown-example/edit) | [/posts/_slug/edit.html](https://github.com/sharp-apps/blog/blob/master/app/posts/_slug/edit.html) | slug=markdown-example |
 
 ### Layout and partial recommended naming conventions
 
@@ -493,17 +497,17 @@ If you follow the recommended `_{name}-partial.html` naming convention you will 
     ===============================
 
 {{#raw content}}{{#markdown}}
-This Blog App demonstrates some of the capabilities in [ServiceStack Web Apps](http://sharpscript.net/docs/sharp-apps) - an exciting real-time 
+This Blog App demonstrates some of the capabilities in [ServiceStack Web Apps](https://sharpscript.net/docs/sharp-apps) - an exciting real-time 
 development model for developing .NET Core Apps where entire Web Apps can be developed within a live hot-reload experience without any compilation, 
 build tools, dependencies, IDEs or any C# source code necessary by using the powerful and user-friendly 
-[ServiceStack Templates language](https://sharpscript.net//) and its comprehensive built-in functionality.
+[ServiceStack #Script language](https://sharpscript.net/) and its comprehensive built-in functionality.
 
 ### Ultimate Simplicity
 
 This eliminates much of the complexity inherent in developing .NET Web Applications which by their nature results in highly customizable Web Apps 
 where their entire functionality can be modified in real-time whilst the App is running, which is simple enough to be enhanced by non-developers 
-like Designers and Content Creators courtesy of its approachable [Handlebars-like](https://sharpscript.net//docs/blocks) and familiar 
-[JavaScript syntax](https://sharpscript.net//docs/expression-viewer#expression=map(range(1%2Ccount)%2C%20x%20%3D%3E%20x%20*%20x)&count=5).
+like Designers and Content Creators courtesy of its approachable [Handlebars-like](https://sharpscript.net/docs/blocks) and familiar 
+[JavaScript syntax](https://sharpscript.net/docs/expression-viewer#expression=map(range(1%2Ccount)%2C%20x%20%3D%3E%20x%20*%20x)&count=5).
 
 Compiled Apps can have a prohibitively large barrier to entry where any modification often requires downloading source code separately, setting 
 up a matching development environment with appropriate extensions and correct versions and non cursory level of experience with their chosen 
@@ -516,7 +520,7 @@ rich Admin UI for searching, browsing and modifying Redis's core data structures
 
 ## Blog App Features
 
-This [/Blog](https://github.com/NetCoreWebApps/Blog/tree/master/app) Web App is another example of encapsulating useful functionality in a 
+This [/Blog](https://github.com/sharp-apps/blog/tree/master/app) Web App is another example of encapsulating useful functionality in a 
 highly customizable .NET Core Web App which to maximize approachability has no C# source code, plugins and uses no JavaScript or CSS frameworks.
 The development of which ended up being one of the most enjoyable experiences we've had in recent memory where all the usual complexities of 
 developing a C# Server and modern JS App has been dispensed and you can just focus on the App you want to create, 
@@ -524,7 +528,7 @@ using a plain-text editor on the left, a live updating browser on the right and 
 
 Any infrastructure dependencies have also been avoided by using SQLite by default which is 
 [automatically created an populated on first run](/posts/web-app-customizations) if no database exists, or if preferred can be 
-[changed to use any other popular RDBMS](http://sharpscript.net/docs/sharp-apps#multi-platform-configurations) using just config.
+[changed to use any other popular RDBMS](https://sharpscript.net/docs/sharp-apps#multi-platform-configurations) using just config.
 
 ### Multi User Blogging Platform
 
@@ -536,9 +540,9 @@ is hosted and the OAuth Keys for the Twitter OAuth App created at https://apps.t
 ### Rich Content
 
 Whilst most blogging platforms just edit static text, each Post content has access to the powerful and 
-[Sandboxed](https://sharpscript.net//docs/sandbox) features in https://sharpscript.net/ which can be used to create 
+[Sandboxed](https://sharpscript.net/docs/sandbox) features in https://sharpscript.net/ which can be used to create 
 [Live Documents](/posts/live-document-example) or [Render Markdown](/posts/markdown-example) which is itself just 
-[one of the available blocks](https://sharpscript.net//docs/blocks#markdown) where it will render to HTML any content between the `markdown` blocks:
+[one of the available blocks](https://sharpscript.net/docs/blocks#markdown) where it will render to HTML any content between the `markdown` blocks:
 {{/markdown}}
 
 <pre><code>{​{#markdown}}
@@ -572,7 +576,7 @@ the database instead of `localStorage`.
 
 ### Server Validation
 
-The [new.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/posts/new.html) and [edit.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/posts/_slug/edit.html) pages shows examples of performing server validation with ServiceStack Templates:
+The [new.html](https://github.com/sharp-apps/blog/blob/master/app/posts/new.html) and [edit.html](https://github.com/sharp-apps/blog/blob/master/app/posts/_slug/edit.html) pages shows examples of performing server validation with ServiceStack #Script:
 
 ```
 {{ assignErrorAndContinueExecuting: ex }}
@@ -587,7 +591,7 @@ The [new.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/posts/new.
 
 ![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/livedemos/blog/server-validation.png)
 
-For more info see the docs on [Error Handling](https://sharpscript.net//docs/error-handling).
+For more info see the docs on [Error Handling](https://sharpscript.net/docs/error-handling).
 
 ### Live Previews
 
@@ -600,7 +604,7 @@ should be rendered in, e.g:
     <div class="preview"></div>
 
 The implementation of which is surprisingly simple where the JavaScript snippet in 
-[default.js](https://github.com/NetCoreWebApps/Blog/blob/master/app/default.js) below is used to send their content on each change:
+[default.js](https://github.com/sharp-apps/blog/blob/master/app/default.js) below is used to send their content on each change:
 
 ```
 // Enable Live Preview of new Content
@@ -630,7 +634,7 @@ function livepreview(e) {
 }
 ```
 
-To the [/preview.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/preview.html) API Page which just renders and captures any 
+To the [/preview.html](https://github.com/sharp-apps/blog/blob/master/app/preview.html) API Page which just renders and captures any 
 Template Content its sent and returns the output:
 
 ```
@@ -638,7 +642,7 @@ Template Content its sent and returns the output:
 {{ response | return({ contentType:'text/plain' }) }}
 ```
 
-By default the `evalTemplate` filter renders Templates in a new `TemplateContext` which can be customized to utilize any additional 
+By default the `evalTemplate` filter renders ` in a new `ScriptContext` which can be customized to utilize any additional 
 `plugins`, `filters` and `blocks` available in the configured [SharpPagesFeature](https://sharpscript.net/docs/sharp-pages), 
 or for full access you can use `{use:{context:true}}` to evaluate any Template content under the same context that `evalTemplate` is run on.
 
