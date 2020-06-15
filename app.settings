@@ -1,4 +1,4 @@
-debug true
+debug false
 name Blog Web App
 db sqlite
 db.connection blog.sqlite
@@ -14,4 +14,4 @@ oauth.twitter.ConsumerSecret WNeOT6YalxXDR4iWZjc4jVjFaydoDcY8jgRrGc5FVLjsVlY2Y8
 
 args.blog { name:'blog.web-app.io', href:'/' }
 
-CefConfig { width:1150, height:900 }
+CefConfig { width:1150, height:1050 }
