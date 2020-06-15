@@ -1,5 +1,5 @@
 API /preview
   * content : string - #Script to evaluate
 
-{{ qs.content  | evalTemplate({use:{plugins:'MarkdownScriptPlugin'}}) | assignTo:response }}
-{{ response | return({ contentType:'text/plain' }) }}
+{{ var response = qs.content.evalTemplate({use:{plugins:'MarkdownScriptPlugin'}}) }}
+{{ response |> return({ contentType:'text/plain' }) }}

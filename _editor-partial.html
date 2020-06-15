@@ -1,5 +1,5 @@
 
-{{ it | withoutKeys(['it','error']) | assignTo: attrs }}
+{{ var attrs = it.ownProps() }}
 
 <div class="editor">
     <div class="editor-toolbar">
@@ -83,7 +83,7 @@
         </div>
     </div>
 
-    <textarea {{ attrs | htmlAttrs }}>{{content}}</textarea>
+    <textarea {{ attrs |> htmlAttrs }}>{{content}}</textarea>
     <a class="input-help" href="http://templates.servicestack.net/">template syntax</a>
     {{#if error}}<div class="error">{{error}}</div>{{/if}}
 </div>

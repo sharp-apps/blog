@@ -22,24 +22,24 @@
             <a href="/{{CreatedBy}}">@{{ CreatedBy }}</a>
         </div>
     </div>
-    {{'contentActions' | partial({ Slug }) }}
+    {{'contentActions' |> partial({ Slug }) }}
 {{/if}}
 
     <h2 class="post-title">
         <a href="/posts/{{Slug}}">{{Title}}</a>
     </h2>
     <div class="post-date">
-        {{ Created | toDateTime | dateFormat('dddd, dd MMMM') }}
+        {{ Created |> toDateTime |> dateFormat('dddd, dd MMMM') }}
     </div>
     
-    {{ { 'data-edit-path': `/posts/${Slug}/edit`} | if(isAuthenticated and userName = CreatedBy) | assignTo: attrs }}
+    {{ { 'data-edit-path': `/posts/${Slug}/edit`} |> if (isAuthenticated and userName == CreatedBy) |> to => attrs }}
 
     <div class="post-content" {{ attrs | htmlAttrs }}>
-        {{ Content | evalTemplate({use:{plugins:'MarkdownScriptPlugin'}}) | raw }}
+        {{ Content |> evalTemplate({use:{plugins:'MarkdownScriptPlugin'}}) |> raw }}
     </div>
 
 {{#if hidePostInfo}}
-    {{ 'contentActions' | partial({ Slug }) }}
+    {{ 'contentActions' |> partial({ Slug }) }}
 {{/if}}
 
 </div>

@@ -14,18 +14,18 @@
     <h3 id="title"><a href="{{ blog.href ?? '/' }}">{{ blog.name ?? 'blog' }}</a></h3>
 
 {{#if isAuthenticated }}
-    {{ `SELECT * from UserInfo WHERE UserName = @userName`   | dbSingle({ userName }) | assignTo: userInfo }}
+    {{ `SELECT * from UserInfo WHERE UserName = @userName`   | dbSingle({ userName }) |> to => userInfo }}
     {{#if !userInfo}}
-        {{ userSession.providerOAuthAccess[0]                | assignTo: twitterAuth }}
-        {{ twitterAuth.items.profileUrl | replace(`\\/`,'/') | assignTo: avatarUrl }}
-        {{ avatarUrl | replace('_normal','')                 | assignTo: avatarUrlLarge }}
-        {{ `datetime(CURRENT_TIMESTAMP,'localtime')`         | assignTo: sqlNow }}
+        {{ var twitterAuth    = userSession.providerOAuthAccess[0] }}
+        {{ var avatarUrl      = twitterAuth.items.profileUrl.replace(`\\/`,'/') }}
+        {{ var avatarUrlLarge = avatarUrl.replace('_normal','') }}
+        {{ var sqlNow         = `datetime(CURRENT_TIMESTAMP,'localtime')` }}
 
         {{ `INSERT INTO UserInfo (UserName, DisplayName, AvatarUrl, AvatarUrlLarge, Created, Modified) 
                           VALUES (@userName, @name, @avatarUrl, @avatarUrlLarge, ${sqlNow}, ${sqlNow})`
-           | dbExec({ userName, name: userSession.displayName, avatarUrl, avatarUrlLarge }) }}
+           |> dbExec({ userName, name: userSession.displayName, avatarUrl, avatarUrlLarge }) }}
     {{else}}
-        {{ userInfo.AvatarUrl | assignTo: avatarUrl }}
+        {{ var avatarUrl = userInfo.AvatarUrl}}
     {{/if}}
 
     <script>

@@ -28,10 +28,10 @@ Create blog.sqlite if not exists
         "Modified" VARCHAR(8000) NOT NULL
     );` 
     
-    | dbExec
+    |> dbExec
 }}
 
-{{ dbScalar(`SELECT COUNT(*) FROM Post`) | assignTo: postsCount }}
+{{ var postsCount = dbScalar(`SELECT COUNT(*) FROM Post`) }}
 
 {{#if postsCount == 0 }}
 
@@ -39,8 +39,8 @@ Create blog.sqlite if not exists
     Seed with initial UserInfo and Post data
     ========================================
 
-    {{ `datetime(CURRENT_TIMESTAMP,'localtime')` | assignTo: sqlNow }}
-    {{ `ServiceStack`                            | assignTo: user }}
+    {{ var sqlNow = `datetime(CURRENT_TIMESTAMP,'localtime')` }}
+    {{ var user   = `ServiceStack` }}
 
     ========================
     Create ServiceStack User - Contains same info as if was @ServiceStack authenticated via Twitter
@@ -48,7 +48,7 @@ Create blog.sqlite if not exists
 
     {{ `INSERT INTO UserInfo (UserName, DisplayName, AvatarUrl, AvatarUrlLarge, Created, Modified) 
                       VALUES (@user, @user, @avatarUrl, @avatarUrlLarge, ${sqlNow}, ${sqlNow})`
-        | dbExec({ 
+        |> dbExec({ 
             user: 'ServiceStack', 
             avatarUrl: 'https://pbs.twimg.com/profile_images/876249730078056448/JuTVEkWX_normal.jpg',
             avatarUrlLarge: 'https://pbs.twimg.com/profile_images/876249730078056448/JuTVEkWX.jpg'
@@ -56,7 +56,7 @@ Create blog.sqlite if not exists
     }}
 
     ===============================================
-    {{ 'Live Document Example' | assignTo: title }}
+    {{ var title = 'Live Document Example' }}
     ===============================================
 
 {{#raw content}}{{#markdown}}
@@ -66,44 +66,44 @@ easy to use [sandboxed](http://templates.servicestack.net/docs/sandbox) dynamic 
 {{/markdown}}
 
 <pre>
-{{ 11200 | assignTo: balance }}
-{{ 10    | assignTo: projectedMonths }}
+{{ var balance = 11200 }}
+{{ var projectedMonths = 10 }}
 {{'
 Salary:        4000
 App Royalties: 200
-'| trim | parseKeyValueText(':') | assignTo: monthlyRevenues }}
+'|> trim |> parseKeyValueText(':') |> to => monthlyRevenues }}
 {{'
 Rent      1000
 Internet  50
 Mobile    50
 Food      400
 Misc      200
-'| trim | parseKeyValueText | assignTo: monthlyExpenses }}
-{{ monthlyRevenues | values | sum | assignTo: totalRevenues }}
-{{ monthlyExpenses | values | sum | assignTo: totalExpenses }}
-{{ subtract(totalRevenues, totalExpenses) | assignTo: totalSavings }}
+'|> trim |> parseKeyValueText |> to => monthlyExpenses }}
+{{ monthlyRevenues |> values |> sum |> to => totalRevenues }}
+{{ monthlyExpenses |> values |> sum |> to => totalExpenses }}
+{{ subtract(totalRevenues, totalExpenses) |> to => totalSavings }}
 
-Current Balance:              <b>{{ balance | currency }}</b>
+Current Balance:              <b>{{ balance |> currency }}</b>
 
 Monthly Revenues:
-{{ monthlyRevenues | toList | select: { it.Key | padRight(30) }{ it.Value | currency }\n }}
-Total                         <b>{{ totalRevenues | currency }}</b>
+{{ monthlyRevenues |> toList |> select: { it.Key |> padRight(30) }{ it.Value |> currency }\n }}
+Total                         <b>{{ totalRevenues |> currency }}</b>
 
 Monthly Expenses:
-{{ monthlyExpenses | toList | select: { it.Key | padRight(30) }{ it.Value | currency }\n }}
-Total                         <b>{{ totalExpenses | currency }}</b>
+{{ monthlyExpenses |> toList |> select: { it.Key |> padRight(30) }{ it.Value |> currency }\n }}
+Total                         <b>{{ totalExpenses |> currency }}</b>
 
-Monthly Savings:              <b>{{ totalSavings | currency }}</b>
+Monthly Savings:              <b>{{ totalSavings |> currency }}</b>
 
 Projected Cash Position:
-{{ projectedMonths | times | map => index + 1
- | select: { now | addMonths(it) | dateFormat }                    <b>{ totalSavings | multiply(it) | add(balance) | currency }</b>\n }}
+{{ projectedMonths |> times |> map => index + 1
+ |> select: { now |> addMonths(it) |> dateFormat }                    <b>{ totalSavings |> multiply(it) |> add(balance) |> currency }</b>\n }}
 </pre>{{/raw}}
 
-    {{ { title, content } | addTo: initialPosts }}
+    {{ { title, content } |> addTo => initialPosts }}
 
     ==========================================
-    {{ 'Markdown Example' | assignTo: title }}
+    {{ var title = 'Markdown Example' }}
     ==========================================
 
 {{#raw content}}{{#markdown}}
@@ -136,10 +136,10 @@ Indent lines by 4 spaces to create pre-formatted code blocks in monospace font:
 Follow [link to markdown block docs](http://templates.servicestack.net/docs/blocks#markdown) for more info.
 {{/markdown}}{{/raw}}
 
-    {{ { title, content } | addTo: initialPosts }}
+    {{ { title, content } |> addTo: initialPosts }}
 
     ================================================
-    {{ 'Web App Customizations' | assignTo: title }}
+    {{ var title = 'Web App Customizations' }}
     ================================================
 
 {{#raw content}}{{#markdown}}
@@ -162,10 +162,10 @@ This is used in this Blog's [_init.html](https://github.com/NetCoreWebApps/Blog/
         "Created" VARCHAR(8000) NOT NULL,
         "Modified" VARCHAR(8000) NOT NULL
     );`    
-    | dbExec
+    |> dbExec
 }}
 
-{{ dbScalar(`SELECT COUNT(*) FROM Post`) | assignTo: postsCount }}
+{{ var postsCount = dbScalar(`SELECT COUNT(*) FROM Post`) }}
 
 {{#if postsCount == 0 }}
 
@@ -187,7 +187,7 @@ The output of the `_init` page is captured in the `initout` argument which can b
 <div>
     Output from init.html:
 
-    <pre>{{initout | raw}}</pre>
+    <pre>{{initout |> raw}}</pre>
 </div>
 ```
 
@@ -261,10 +261,10 @@ args.blogHref /
 
 {{/markdown}}{{/raw}}
 
-{{ { title, content } | addTo: initialPosts }}
+{{ { title, content } |> addTo => initialPosts }}
 
     ============================================
-    {{ 'Dynamic API Pages' | assignTo: title }}
+    {{ var title = 'Dynamic API Pages' }}
     ============================================
 
 {{#raw content}}{{#markdown}}
@@ -303,7 +303,7 @@ An API which returns the same wire response as above can be implemented in API P
 with the contents:
 
 ```
-{{ { result: `Hello, ${name}!` } | return }}
+{{ { result: `Hello, ${name}!` } |> return }}
 ```
 
 Which supports the same content negotiation as a ServiceStack Service where calling it in a browser will generate a 
@@ -319,9 +319,9 @@ return the API response in the JSON Format:
 Alternatively you can force a JSON Response by specifying it with:
 
 ```
-{{ { result: `Hello, ${name}!` } | return({ format: 'json' }) }} 
+{{ { result: `Hello, ${name}!` } |> return({ format: 'json' }) }} 
 // Equivalent to:
-{{ { result: `Hello, ${name}!` } | return({ contentType: 'application/json' }) }}
+{{ { result: `Hello, ${name}!` } |> return({ contentType: 'application/json' }) }}
 ```
 
 ### /preview API Page
@@ -331,8 +331,8 @@ Alternatively you can force a JSON Response by specifying it with:
 The [/preview.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/preview.html) page uses this to force a plain-text response with:
 
 ```
-{{ content  | evalTemplate({use:{plugins:'MarkdownScriptPlugin'}}) | assignTo:response }}
-{{ response | return({ contentType:'text/plain' }) }}
+{{ var response = content.evalTemplate({use:{plugins:'MarkdownScriptPlugin'}}) }}
+{{ response |> return({ contentType:'text/plain' }) }}
 ```
 
 The preview API above is what provides this Blog's Live Preview feature where it will render any ServiceStack Templates provided in the 
@@ -356,8 +356,8 @@ create data-driven APIs where you can literally return the response of an SQL qu
       FROM Post p INNER JOIN UserInfo u on p.CreatedBy = u.UserName 
      WHERE UserName = @user 
     ORDER BY p.Created DESC` 
-   | dbSelect({ user })
-   | return }}
+   |> dbSelect({ user })
+   |> return }}
 ```
 
 The **user** argument is populated as a result of dynamic route from the `_user` directory name which will let you view all 
@@ -389,11 +389,11 @@ The [/posts/_slug/api.html](https://github.com/NetCoreWebApps/Blog/blob/master/a
       FROM Post p INNER JOIN UserInfo u on p.CreatedBy = u.UserName 
      WHERE Slug = @slug 
      ORDER BY p.Created DESC` 
-   | dbSingle({ slug })
-   | assignTo: post 
+   |> dbSingle({ slug })
+   |> to => post 
 }}
 {{ post ?? httpResult({ status:404, statusDescription:'Post was not found' }) 
-   | return }}
+   |> return }}
 ```
 
 The **httpResult** filter returns a ServiceStack `HttpResult` which allows for the following customization's:
@@ -415,7 +415,7 @@ Any other arguments like 'X-Powered-By' are returned as HTTP Response Headers.
 This behaves similarly to customizing a response with return arguments:
 
 ```
-{{ post | return({ format:'json', 'X-Powered-By':'ServiceStack Templates' }) }}
+{{ post |> return({ format:'json', 'X-Powered-By':'ServiceStack Templates' }) }}
 ```
 
 Using the explicit httpResult filter is useful for returning a custom HTTP Response that doesn't have a Response Body, e.g. the **New Post** page 
@@ -425,7 +425,7 @@ after they've successfully created a new Post:
 
 ```
 {{#if success}}
-    {{ httpResult({ status:301, Location:`/${userName}` }) | return }}
+    {{ httpResult({ status:301, Location:`/${userName}` }) |> return }}
 {{/if}}
 ```
 
@@ -433,11 +433,11 @@ For more examples and info on API Pages checkout to the [API Pages docs](http://
 
 {{/markdown}}{{/raw}}
 
-    {{ { title, content } | addTo: initialPosts }}
+    {{ { title, content } |> addTo => initialPosts }}
 
     
     ============================================
-    {{ 'Page based routing' | assignTo: title }}
+    {{ var title = 'Page based routing' }}
     ============================================
 
 {{#raw content}}{{#markdown}}
@@ -479,17 +479,17 @@ Pages with `layout` or `partial` in their name are hidden and ignored in wildcar
 If you follow the recommended `_{name}-partial.html` naming convention you will also be able to reference partials using just their name, i.e:
 
 ```
-{{ 'menu' | partial }}          // Equivalent to:
-{{ '_menu-partial' | partial }}
+{{ 'menu' |> partial }}          // Equivalent to:
+{{ '_menu-partial' |> partial }}
 ```
 
 {{/markdown}}{{/raw}}
 
-    {{ { title, content } | addTo: initialPosts }}
+    {{ { title, content } |> addTo => initialPosts }}
 
 
     ===============================
-    {{ 'About' | assignTo: title }}
+    {{ var title = 'About' }}
     ===============================
 
 {{#raw content}}{{#markdown}}
@@ -578,11 +578,11 @@ The [new.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/posts/new.
 {{ assignErrorAndContinueExecuting: ex }}
 
 {{ 'Title must be between 5 and 200 characters'      
-   | onlyIf(length(postTitle) < 5 || length(postTitle) > 200) | assignTo: titleError }}
+   |> onlyIf(length(postTitle) < 5 || length(postTitle) > 200) |> to => titleError }}
 {{ 'Content must be between 25 and 64000 characters' 
-   | onlyIf(length(content) < 25  || length(content) > 64000) | assignTo: contentError }}
+   |> onlyIf(length(content) < 25  || length(content) > 64000) |> to => contentError }}
 {{ 'Potentially malicious characters detected'       
-   | ifNotExists(contentError) | onlyIf(containsXss(content)) | assignTo: contentError }}
+   |> ifNotExists(contentError) | onlyIf(containsXss(content)) |> to => contentError }}
 ```
 
 ![](https://raw.githubusercontent.com/ServiceStack/Assets/master/img/livedemos/blog/server-validation.png)
@@ -634,7 +634,7 @@ To the [/preview.html](https://github.com/NetCoreWebApps/Blog/blob/master/app/pr
 Template Content its sent and returns the output:
 
 ```
-{{ content  | evalTemplate({use:{plugins:'MarkdownScriptPlugin'}}) | assignTo:response }}
+{{ content  | evalTemplate({use:{plugins:'MarkdownScriptPlugin'}}) |> to =>response }}
 {{ response | return({ contentType:'text/plain' }) }}
 ```
 
@@ -644,7 +644,7 @@ or for full access you can use `{use:{context:true}}` to evaluate any Template c
 
 {{/markdown}}{{/raw}}
 
-    {{ { title, content } | addTo: initialPosts }}
+    {{ { title, content } |> addTo => initialPosts }}
 
 
     ======================
