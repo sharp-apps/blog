@@ -1,5 +1,5 @@
-debug false
-name Blog Web App
+debug true
+name Blog Sharp App
 db sqlite
 db.connection blog.sqlite
 
@@ -7,8 +7,8 @@ features AuthFeature
 AuthFeature.AuthProviders TwitterAuthProvider
 SharpPagesFeature { ScriptAdminRole: 'AllowAnon' }
 
-oauth.RedirectUrl http://localhost:5000/
-oauth.CallbackUrl http://localhost:5000/auth/{0}
+oauth.RedirectUrl https://localhost:5001/
+oauth.CallbackUrl https://localhost:5001/auth/{0}
 oauth.twitter.ConsumerKey JvWZokH73rdghDdCFCFkJtCEU
 oauth.twitter.ConsumerSecret WNeOT6YalxXDR4iWZjc4jVjFaydoDcY8jgRrGc5FVLjsVlY2Y8
 
